@@ -1,5 +1,5 @@
 {
-  "name": "@statly/observe-sdk",
+  "name": "@statly/observe",
   "version": "0.1.0",
   "description": "JavaScript SDK for Statly Observe - Error tracking and monitoring",
   "main": "dist/index.js",
@@ -10,29 +10,54 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./express": {
+      "types": "./dist/integrations/express.d.ts",
+      "import": "./dist/integrations/express.mjs",
+      "require": "./dist/integrations/express.js"
+    },
+    "./nextjs": {
+      "types": "./dist/integrations/nextjs.d.ts",
+      "import": "./dist/integrations/nextjs.mjs",
+      "require": "./dist/integrations/nextjs.js"
+    },
+    "./fastify": {
+      "types": "./dist/integrations/fastify.d.ts",
+      "import": "./dist/integrations/fastify.mjs",
+      "require": "./dist/integrations/fastify.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build": "tsup src/index.ts src/integrations/express.ts src/integrations/nextjs.ts src/integrations/fastify.ts --format cjs,esm --dts --clean",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "eslint src --ext .ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "error-tracking",
     "monitoring",
     "observability",
     "statly",
-    "sdk"
+    "sdk",
+    "apm",
+    "error-monitoring",
+    "exception-tracking"
   ],
-  "author": "Statly",
+  "author": "Statly <support@statly.live>",
   "license": "MIT",
+  "homepage": "https://statly.live",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/statly"
+    "url": "git+https://github.com/KodyDennon/statly-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KodyDennon/statly-node/issues"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
@@ -42,5 +67,8 @@
   "peerDependencies": {},
   "engines": {
     "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
