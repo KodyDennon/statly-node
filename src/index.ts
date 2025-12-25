@@ -8,7 +8,7 @@
  * import { Statly } from '@statly/observe-sdk';
  *
  * Statly.init({
- *   dsn: 'https://observe.statly.live/your-org',
+ *   dsn: 'https://sk_live_xxx@statly.live/your-org',
  *   release: '1.0.0',
  *   environment: 'production',
  * });

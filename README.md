@@ -17,9 +17,9 @@ pnpm add @statly/observe
 ```typescript
 import { Statly } from '@statly/observe';
 
-// Initialize the SDK
+// Initialize the SDK (get your DSN from statly.live/dashboard/observe/setup)
 Statly.init({
-  dsn: 'https://observe.statly.live/your-org',
+  dsn: 'https://sk_live_xxx@statly.live/your-org',
   release: '1.0.0',
   environment: 'production',
 });

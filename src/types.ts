@@ -3,7 +3,7 @@
  */
 
 export interface StatlyOptions {
-    /** DSN for your organization: https://observe.statly.live/<org-slug> */
+    /** DSN for your organization: https://<api-key>@statly.live/<org-slug> */
     dsn: string;
 
     /** Release/version identifier */

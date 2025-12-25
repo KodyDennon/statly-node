@@ -30,7 +30,7 @@ export class Transport {
         this.debug = options.debug ?? false;
 
         // Parse DSN to construct endpoint
-        // DSN format: https://observe.statly.live/<org-slug>
+        // DSN format: https://<api-key>@statly.live/<org-slug>
         // API endpoint: /api/v1/observe/ingest
         this.endpoint = this.parseEndpoint(options.dsn);
 
