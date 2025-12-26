@@ -5,6 +5,10 @@
 
 Error tracking and monitoring for JavaScript and TypeScript applications. Capture exceptions, track releases, and debug issues faster.
 
+**[📚 Full Documentation](https://docs.statly.live/sdk/javascript/installation)** | **[🚀 Get Started](https://statly.live)** | **[💬 Support](mailto:support@mail.kodydennon.com)**
+
+> **This SDK requires a [Statly](https://statly.live) account.** Sign up free at [statly.live](https://statly.live) to get your DSN and start tracking errors in minutes.
+
 ## Features
 
 - Automatic error capturing with stack traces
@@ -30,8 +34,20 @@ pnpm add @statly/observe
 1. Go to [statly.live/dashboard/observe/setup](https://statly.live/dashboard/observe/setup)
 2. Create an API key for Observe
 3. Copy your DSN (format: `https://<api-key>@statly.live/<org-slug>`)
+4. Add to your `.env` file: `STATLY_DSN=https://...`
 
 ## Quick Start
+
+The SDK automatically loads DSN from environment variables, so you can simply:
+
+```typescript
+import { Statly } from '@statly/observe';
+
+// Auto-loads STATLY_DSN from environment
+Statly.init();
+```
+
+Or pass it explicitly:
 
 ```typescript
 import { Statly } from '@statly/observe';
@@ -192,11 +208,23 @@ fastify.get('/', async () => {
 fastify.listen({ port: 3000 });
 ```
 
+## Environment Variables
+
+The SDK automatically loads configuration from environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `STATLY_DSN` | Your project's DSN (primary) |
+| `NEXT_PUBLIC_STATLY_DSN` | DSN for Next.js client-side |
+| `STATLY_OBSERVE_DSN` | Alternative DSN variable |
+| `STATLY_ENVIRONMENT` | Environment name |
+| `NODE_ENV` | Fallback for environment |
+
 ## Configuration Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `dsn` | `string` | **Required** | Your project's Data Source Name |
+| `dsn` | `string` | `process.env.STATLY_DSN` | Your project's Data Source Name |
 | `environment` | `string` | `undefined` | Environment name (production, staging, development) |
 | `release` | `string` | `undefined` | Release/version identifier for tracking |
 | `debug` | `boolean` | `false` | Enable debug logging to console |
@@ -335,6 +363,26 @@ import type {
 
 - Node.js 16+
 - Works in browser environments (with bundler)
+
+## Resources
+
+- **[Statly Platform](https://statly.live)** - Sign up and manage your error tracking
+- **[Documentation](https://docs.statly.live/sdk/javascript/installation)** - Full SDK documentation
+- **[API Reference](https://docs.statly.live/sdk/javascript/api-reference)** - Complete API reference
+- **[Express Guide](https://docs.statly.live/sdk/javascript/express)** - Express integration
+- **[Next.js Guide](https://docs.statly.live/sdk/javascript/nextjs)** - Next.js integration
+- **[Fastify Guide](https://docs.statly.live/sdk/javascript/fastify)** - Fastify integration
+- **[MCP Server](https://github.com/KodyDennon/DD-StatusPage/tree/master/packages/mcp-docs-server)** - AI/Claude integration for docs
+
+## Why Statly?
+
+Statly is more than error tracking. Get:
+- **Status Pages** - Beautiful public status pages for your users
+- **Uptime Monitoring** - Multi-region HTTP/DNS checks every minute
+- **Error Tracking** - SDKs for JavaScript, Python, and Go
+- **Incident Management** - Track and communicate outages
+
+All on Cloudflare's global edge network. [Start free →](https://statly.live)
 
 ## License
 

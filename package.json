@@ -1,10 +1,13 @@
 {
   "name": "@statly/observe",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "JavaScript SDK for Statly Observe - Error tracking and monitoring",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "bin": {
+    "statly-observe": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -30,10 +33,11 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "bin"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/integrations/express.ts src/integrations/nextjs.ts src/integrations/fastify.ts --format cjs,esm --dts --clean",
+    "build": "tsup src/index.ts src/integrations/express.ts src/integrations/nextjs.ts src/integrations/fastify.ts src/cli.ts --format cjs,esm --dts --clean",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "eslint src --ext .ts",
     "test": "vitest run",
@@ -49,7 +53,7 @@
     "error-monitoring",
     "exception-tracking"
   ],
-  "author": "Statly <support@statly.live>",
+  "author": "Statly <support@mail.kodydennon.com>",
   "license": "MIT",
   "homepage": "https://statly.live",
   "repository": {
@@ -60,6 +64,7 @@
     "url": "https://github.com/KodyDennon/statly-node/issues"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"

@@ -13,7 +13,7 @@ const SDK_NAME = '@statly/observe-sdk';
 const SDK_VERSION = '0.1.0';
 
 export class StatlyClient {
-    private options: Required<StatlyOptions>;
+    private options: Required<StatlyOptions> & { dsn: string };
     private transport: Transport;
     private breadcrumbs: BreadcrumbManager;
     private globalHandlers: GlobalHandlers;
@@ -21,7 +21,7 @@ export class StatlyClient {
     private user: User | null = null;
     private initialized = false;
 
-    constructor(options: StatlyOptions) {
+    constructor(options: StatlyOptions & { dsn: string }) {
         this.options = this.mergeOptions(options);
         this.transport = new Transport({
             dsn: this.options.dsn,
@@ -32,7 +32,7 @@ export class StatlyClient {
         this.consoleIntegration = new ConsoleIntegration();
     }
 
-    private mergeOptions(options: StatlyOptions): Required<StatlyOptions> {
+    private mergeOptions(options: StatlyOptions & { dsn: string }): Required<StatlyOptions> & { dsn: string } {
         return {
             dsn: options.dsn,
             release: options.release ?? '',

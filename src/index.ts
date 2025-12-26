@@ -46,15 +46,73 @@ import type { StatlyOptions, User, Breadcrumb, EventLevel } from './types';
 let client: StatlyClient | null = null;
 
 /**
- * Initialize the Statly SDK
+ * Load DSN from environment variables
+ * Checks: STATLY_DSN, NEXT_PUBLIC_STATLY_DSN, STATLY_OBSERVE_DSN
  */
-function init(options: StatlyOptions): void {
+function loadDsnFromEnv(): string | undefined {
+    // Node.js environment
+    if (typeof process !== 'undefined' && process.env) {
+        return (
+            process.env.STATLY_DSN ||
+            process.env.NEXT_PUBLIC_STATLY_DSN ||
+            process.env.STATLY_OBSERVE_DSN
+        );
+    }
+    return undefined;
+}
+
+/**
+ * Load environment from environment variables
+ */
+function loadEnvironmentFromEnv(): string | undefined {
+    if (typeof process !== 'undefined' && process.env) {
+        return (
+            process.env.STATLY_ENVIRONMENT ||
+            process.env.NODE_ENV
+        );
+    }
+    return undefined;
+}
+
+/**
+ * Initialize the Statly SDK
+ *
+ * DSN can be passed explicitly or loaded from environment variables:
+ * - STATLY_DSN
+ * - NEXT_PUBLIC_STATLY_DSN (for Next.js)
+ * - STATLY_OBSERVE_DSN
+ *
+ * @example
+ * // Explicit DSN
+ * Statly.init({ dsn: 'https://sk_live_xxx@statly.live/your-org' });
+ *
+ * // Auto-load from .env
+ * Statly.init(); // Uses STATLY_DSN from environment
+ */
+function init(options?: Partial<StatlyOptions>): void {
     if (client) {
         console.warn('[Statly] SDK already initialized. Call close() first to reinitialize.');
         return;
     }
 
-    client = new StatlyClient(options);
+    // Auto-load DSN from environment if not provided
+    const dsn = options?.dsn || loadDsnFromEnv();
+    if (!dsn) {
+        console.error('[Statly] No DSN provided. Set STATLY_DSN in your environment or pass dsn to init().');
+        console.error('[Statly] Get your DSN at https://statly.live/dashboard/observe/setup');
+        return;
+    }
+
+    // Auto-load environment from env if not provided
+    const environment = options?.environment || loadEnvironmentFromEnv();
+
+    const finalOptions = {
+        ...options,
+        dsn,
+        environment,
+    };
+
+    client = new StatlyClient(finalOptions as StatlyOptions & { dsn: string });
     client.init();
 }
 
