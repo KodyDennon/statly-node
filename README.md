@@ -33,8 +33,10 @@ pnpm add @statly/observe
 
 1. Go to [statly.live/dashboard/observe/setup](https://statly.live/dashboard/observe/setup)
 2. Create an API key for Observe
-3. Copy your DSN (format: `https://<api-key>@statly.live/<org-slug>`)
+3. Copy your DSN (format: `https://<key-prefix>@statly.live/<org-slug>`)
 4. Add to your `.env` file: `STATLY_DSN=https://...`
+
+**Note**: The DSN contains only a 16-character key prefix (e.g., `sk_live_a1b2c3d4`) which is safe to embed in client-side code. For server-side operations requiring full permissions, use the complete API key.
 
 ## Quick Start
 
@@ -54,7 +56,7 @@ import { Statly } from '@statly/observe';
 
 // Initialize the SDK
 Statly.init({
-  dsn: 'https://sk_live_xxx@statly.live/your-org',
+  dsn: 'https://sk_live_a1b2c3d4@statly.live/your-org',
   release: '1.0.0',
   environment: 'production',
 });
@@ -100,7 +102,7 @@ const app = express();
 
 // Initialize first
 Statly.init({
-  dsn: 'https://sk_live_xxx@statly.live/your-org',
+  dsn: 'https://sk_live_a1b2c3d4@statly.live/your-org',
   environment: process.env.NODE_ENV,
 });
 
@@ -192,7 +194,7 @@ import { Statly, statlyFastifyPlugin } from '@statly/observe';
 const fastify = Fastify();
 
 Statly.init({
-  dsn: 'https://sk_live_xxx@statly.live/your-org',
+  dsn: 'https://sk_live_a1b2c3d4@statly.live/your-org',
 });
 
 // Register the plugin
