@@ -12,6 +12,8 @@ Error tracking and monitoring for JavaScript and TypeScript applications. Captur
 ## Features
 
 - Automatic error capturing with stack traces
+- **Distributed Tracing**: Visualize function execution and call hierarchies
+- **Performance Metrics**: Automated capture of latency and success rates
 - Breadcrumbs for debugging context
 - User context tracking
 - Release tracking
@@ -86,8 +88,43 @@ Statly.addBreadcrumb({
   level: 'info',
 });
 
-// Flush before exit (important for serverless)
+# Flush before exit (important for serverless)
 await Statly.close();
+```
+
+## Tracing & Performance
+
+Statly Observe supports distributed tracing to help you visualize execution flow and measure backend performance.
+
+### Automatic Tracing
+
+Use `Statly.trace()` to wrap functions. It works with both synchronous and asynchronous code:
+
+```typescript
+import { Statly } from '@statly/observe';
+
+const result = await Statly.trace('process_payment', async (span) => {
+  span.setTag('provider', 'stripe');
+  
+  // Your logic here
+  const payment = await stripe.charges.create({...});
+  
+  return payment;
+});
+```
+
+### Manual Spans
+
+For low-level control, you can start spans manually:
+
+```typescript
+const span = Statly.startSpan('database_query');
+try {
+  await db.query('...');
+  span.setTag('query_type', 'SELECT');
+} finally {
+  span.finish(); // Reports to Statly
+}
 ```
 
 ## Framework Integrations

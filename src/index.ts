@@ -210,6 +210,36 @@ function getClient(): StatlyClient | null {
     return client;
 }
 
+/**
+ * Execute a function within a trace span
+ */
+async function trace<T>(
+    name: string,
+    operation: (span: import('./span').Span) => Promise<T> | T,
+    tags?: Record<string, string>
+): Promise<T> {
+    if (!client) {
+        return operation(null as any);
+    }
+    return client.trace(name, operation, tags);
+}
+
+/**
+ * Start a new tracing span
+ */
+function startSpan(name: string, tags?: Record<string, string>): import('./span').Span | null {
+    if (!client) return null;
+    return client.startSpan(name, tags);
+}
+
+/**
+ * Capture a completed span
+ */
+function captureSpan(span: import('./span').Span): string {
+    if (!client) return '';
+    return client.captureSpan(span);
+}
+
 // Export as namespace-like object
 export const Statly = {
     init,
@@ -222,6 +252,9 @@ export const Statly = {
     flush,
     close,
     getClient,
+    trace,
+    startSpan,
+    captureSpan,
 } as const;
 
 // Also export individual functions and types
@@ -236,6 +269,9 @@ export {
     flush,
     close,
     getClient,
+    trace,
+    startSpan,
+    captureSpan,
 };
 
 export { StatlyClient } from './client';

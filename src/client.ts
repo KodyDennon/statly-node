@@ -8,6 +8,8 @@ import { Transport } from './transport';
 import { BreadcrumbManager } from './breadcrumbs';
 import { GlobalHandlers } from './integrations/global-handlers';
 import { ConsoleIntegration } from './integrations/console';
+import { TelemetryProvider } from './telemetry';
+import { Span } from './span';
 
 const SDK_NAME = '@statly/observe-sdk';
 const SDK_VERSION = '0.1.0';
@@ -30,6 +32,7 @@ export class StatlyClient {
         this.breadcrumbs = new BreadcrumbManager(this.options.maxBreadcrumbs);
         this.globalHandlers = new GlobalHandlers();
         this.consoleIntegration = new ConsoleIntegration();
+        TelemetryProvider.getInstance().setClient(this);
     }
 
     private mergeOptions(options: StatlyOptions & { dsn: string }): Required<StatlyOptions> & { dsn: string } {
@@ -130,6 +133,38 @@ export class StatlyClient {
         });
 
         return this.sendEvent(event);
+    }
+
+    /**
+     * Capture a completed span
+     */
+    captureSpan(span: Span): string {
+        const event = this.buildEvent({
+            message: `Span: ${span.name}`,
+            level: 'span',
+            span: span.toDict(),
+        });
+
+        return this.sendEvent(event);
+    }
+
+    /**
+     * Start a new tracing span
+     */
+    startSpan(name: string, tags?: Record<string, string>): Span {
+        return TelemetryProvider.getInstance().startSpan(name, tags);
+    }
+
+    /**
+     * Execute a function within a trace span
+     */
+    async trace<T>(
+        name: string,
+        operation: (span: Span) => Promise<T> | T,
+        tags?: Record<string, string>
+    ): Promise<T> {
+        const { trace: traceFn } = await import('./telemetry');
+        return traceFn(name, operation, tags);
     }
 
     /**

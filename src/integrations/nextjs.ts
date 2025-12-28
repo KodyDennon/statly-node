@@ -64,36 +64,43 @@ type NextApiHandler<T = unknown> = (
  */
 export function withStatlyPagesApi<T>(handler: NextApiHandler<T>): NextApiHandler<T> {
     return async (req: NextApiRequest, res: NextApiResponse) => {
-        // Add request breadcrumb
-        Statly.addBreadcrumb({
-            category: 'http',
-            message: `${req.method} ${req.url}`,
-            level: 'info',
-            data: {
-                method: req.method,
-                url: req.url,
-            },
-        });
+        return Statly.trace(`${req.method} ${req.url}`, async (span) => {
+            span.setTag('component', 'nextjs-pages-api');
+            span.setTag('http.method', req.method || 'GET');
+            span.setTag('http.url', req.url || 'unknown');
 
-        try {
-            return await handler(req, res);
-        } catch (error) {
-            // Build context
-            const context: Record<string, unknown> = {
-                request: {
+            // Add request breadcrumb
+            Statly.addBreadcrumb({
+                category: 'http',
+                message: `${req.method} ${req.url}`,
+                level: 'info',
+                data: {
                     method: req.method,
                     url: req.url,
-                    headers: sanitizeHeaders(req.headers),
-                    query: req.query,
                 },
-            };
+            });
 
-            // Capture the exception
-            Statly.captureException(error, context);
+            try {
+                const result = await handler(req, res);
+                return result;
+            } catch (error) {
+                // Build context
+                const context: Record<string, unknown> = {
+                    request: {
+                        method: req.method,
+                        url: req.url,
+                        headers: sanitizeHeaders(req.headers),
+                        query: req.query,
+                    },
+                };
 
-            // Re-throw for Next.js error handling
-            throw error;
-        }
+                // Capture the exception
+                Statly.captureException(error, context);
+
+                // Re-throw for Next.js error handling
+                throw error;
+            }
+        });
     };
 }
 
@@ -118,50 +125,60 @@ type NextRouteHandler = (
  */
 export function withStatly<T extends NextRouteHandler>(handler: T): T {
     const wrappedHandler = async (request: NextRequest, context?: { params?: Promise<Record<string, string>> }) => {
-        // Add request breadcrumb
-        Statly.addBreadcrumb({
-            category: 'http',
-            message: `${request.method} ${request.nextUrl?.pathname || request.url}`,
-            level: 'info',
-            data: {
-                method: request.method,
-                url: request.nextUrl?.pathname || request.url,
-            },
-        });
+        return Statly.trace(`${request.method} ${request.nextUrl?.pathname || request.url}`, async (span) => {
+            span.setTag('component', 'nextjs-app-router');
+            span.setTag('http.method', request.method);
+            span.setTag('http.url', request.nextUrl?.pathname || request.url);
 
-        try {
-            return await handler(request, context);
-        } catch (error) {
-            // Build context
-            const headers: Record<string, string> = {};
-            request.headers.forEach((value, key) => {
-                headers[key] = value;
-            });
-
-            const errorContext: Record<string, unknown> = {
-                request: {
+            // Add request breadcrumb
+            Statly.addBreadcrumb({
+                category: 'http',
+                message: `${request.method} ${request.nextUrl?.pathname || request.url}`,
+                level: 'info',
+                data: {
                     method: request.method,
                     url: request.nextUrl?.pathname || request.url,
-                    headers: sanitizeHeaders(headers),
-                    searchParams: request.nextUrl?.searchParams?.toString(),
                 },
-            };
+            });
 
-            // Add route params if available
-            if (context?.params) {
-                try {
-                    errorContext.params = await context.params;
-                } catch {
-                    // Ignore errors getting params
+            try {
+                const result = await handler(request, context);
+                if (result instanceof Response) {
+                    span.setTag('http.status_code', result.status.toString());
                 }
+                return result;
+            } catch (error) {
+                // Build context
+                const headers: Record<string, string> = {};
+                request.headers.forEach((value, key) => {
+                    headers[key] = value;
+                });
+
+                const errorContext: Record<string, unknown> = {
+                    request: {
+                        method: request.method,
+                        url: request.nextUrl?.pathname || request.url,
+                        headers: sanitizeHeaders(headers),
+                        searchParams: request.nextUrl?.searchParams?.toString(),
+                    },
+                };
+
+                // Add route params if available
+                if (context?.params) {
+                    try {
+                        errorContext.params = await context.params;
+                    } catch {
+                        // Ignore errors getting params
+                    }
+                }
+
+                // Capture the exception
+                Statly.captureException(error, errorContext);
+
+                // Re-throw for Next.js error handling
+                throw error;
             }
-
-            // Capture the exception
-            Statly.captureException(error, errorContext);
-
-            // Re-throw for Next.js error handling
-            throw error;
-        }
+        });
     };
 
     return wrappedHandler as T;
@@ -282,21 +299,26 @@ export function withStatlyServerAction<Args extends unknown[], Result>(
     actionName?: string
 ): (...args: Args) => Promise<Result> {
     return async (...args: Args) => {
-        Statly.addBreadcrumb({
-            category: 'action',
-            message: `Server action: ${actionName || 'unknown'}`,
-            level: 'info',
-        });
+        return Statly.trace(`Action: ${actionName || 'unknown'}`, async (span) => {
+            span.setTag('component', 'nextjs-server-action');
+            span.setTag('action.name', actionName || 'unknown');
 
-        try {
-            return await action(...args);
-        } catch (error) {
-            Statly.captureException(error, {
-                source: 'server-action',
-                actionName,
+            Statly.addBreadcrumb({
+                category: 'action',
+                message: `Server action: ${actionName || 'unknown'}`,
+                level: 'info',
             });
-            throw error;
-        }
+
+            try {
+                return await action(...args);
+            } catch (error) {
+                Statly.captureException(error, {
+                    source: 'server-action',
+                    actionName,
+                });
+                throw error;
+            }
+        });
     };
 }
 

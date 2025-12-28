@@ -94,9 +94,10 @@ export interface DeviceInfo {
 export interface StatlyEvent {
     message: string;
     timestamp?: number;
-    level?: 'debug' | 'info' | 'warning' | 'error' | 'fatal';
+    level?: 'debug' | 'info' | 'warning' | 'error' | 'fatal' | 'span';
     stack?: string;
     exception?: Exception;
+    span?: import('./span').SpanData;
     environment?: string;
     release?: string;
     url?: string;
