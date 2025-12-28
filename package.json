@@ -1,6 +1,6 @@
 {
   "name": "@statly/observe",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "JavaScript SDK for Statly Observe - Error tracking and monitoring",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -28,6 +28,11 @@
       "types": "./dist/integrations/fastify.d.ts",
       "import": "./dist/integrations/fastify.mjs",
       "require": "./dist/integrations/fastify.js"
+    },
+    "./logger": {
+      "types": "./dist/logger/index.d.ts",
+      "import": "./dist/logger/index.mjs",
+      "require": "./dist/logger/index.js"
     }
   },
   "files": [
@@ -37,7 +42,7 @@
     "bin"
   ],
   "scripts": {
-    "build": "tsup src/index.ts src/integrations/express.ts src/integrations/nextjs.ts src/integrations/fastify.ts src/cli.ts --format cjs,esm --dts --clean",
+    "build": "tsup src/index.ts src/integrations/express.ts src/integrations/nextjs.ts src/integrations/fastify.ts src/logger/index.ts src/cli.ts --format cjs,esm --dts --clean",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "eslint src --ext .ts",
     "test": "vitest run",

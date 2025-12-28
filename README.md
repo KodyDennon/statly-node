@@ -12,6 +12,7 @@ Error tracking and monitoring for JavaScript and TypeScript applications. Captur
 ## Features
 
 - Automatic error capturing with stack traces
+- **Structured Logging**: Production-grade logging with automatic scrubbing
 - **Distributed Tracing**: Visualize function execution and call hierarchies
 - **Performance Metrics**: Automated capture of latency and success rates
 - Breadcrumbs for debugging context
@@ -126,6 +127,109 @@ try {
   span.finish(); // Reports to Statly
 }
 ```
+
+## Structured Logging
+
+The Logger class provides production-grade structured logging with automatic secret scrubbing, session management, and batching.
+
+### Quick Start
+
+```typescript
+import { Logger } from '@statly/observe';
+
+const logger = Logger.create({
+  dsn: 'https://sk_live_xxx@statly.live/your-org',
+  environment: 'production',
+  loggerName: 'api-server',
+});
+
+// Log at different levels
+logger.trace('Entering function', { args: [1, 2, 3] });
+logger.debug('Processing request', { requestId: 'req_123' });
+logger.info('User logged in', { userId: 'user_123' });
+logger.warn('Rate limit approaching', { current: 95, limit: 100 });
+logger.error('Payment failed', { orderId: 'ord_456', error: 'Card declined' });
+logger.fatal('Database connection lost', { host: 'db.example.com' });
+logger.audit('User role changed', { userId: 'user_123', newRole: 'admin' });
+
+// Always close before exit
+await logger.close();
+```
+
+### Child Loggers
+
+Create child loggers with inherited context:
+
+```typescript
+const requestLogger = logger.child({
+  context: { requestId: 'req_123' },
+  loggerName: 'request-handler',
+});
+
+requestLogger.info('Processing request'); // Includes requestId automatically
+```
+
+### User Context
+
+Associate logs with users:
+
+```typescript
+logger.setUser({
+  id: 'user_123',
+  email: 'jane@example.com',
+  name: 'Jane Doe',
+});
+```
+
+### Secret Scrubbing
+
+The logger automatically scrubs sensitive data (API keys, passwords, credit cards, etc.). Add custom patterns:
+
+```typescript
+const logger = Logger.create({
+  dsn: '...',
+  scrubPatterns: [
+    /my-custom-secret-[a-z0-9]+/gi,
+    /internal-token-\d+/g,
+  ],
+});
+```
+
+### Sample Rates
+
+Control log volume with per-level sampling:
+
+```typescript
+const logger = Logger.create({
+  dsn: '...',
+  sampleRates: {
+    trace: 0.01,  // 1% of trace logs
+    debug: 0.1,   // 10% of debug logs
+    info: 0.5,    // 50% of info logs
+    warn: 1.0,    // 100% of warnings
+    error: 1.0,   // 100% of errors
+    fatal: 1.0,   // 100% of fatal
+  },
+});
+```
+
+### Logger Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `dsn` | `string` | required | Your project's Data Source Name |
+| `environment` | `string` | `undefined` | Environment name |
+| `release` | `string` | `undefined` | Release/version identifier |
+| `loggerName` | `string` | `undefined` | Logger name for filtering |
+| `sessionId` | `string` | auto-generated | Session ID for grouping logs |
+| `user` | `object` | `undefined` | User context |
+| `defaultContext` | `object` | `{}` | Default context for all logs |
+| `minLevel` | `LogLevel` | `'trace'` | Minimum level to log |
+| `sampleRates` | `object` | all 1.0 | Per-level sample rates |
+| `scrubPatterns` | `RegExp[]` | `[]` | Additional patterns to scrub |
+| `batchSize` | `number` | `50` | Batch size before flush |
+| `flushInterval` | `number` | `5000` | Flush interval in ms |
+| `maxQueueSize` | `number` | `1000` | Max queue size |
 
 ## Framework Integrations
 

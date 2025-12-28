@@ -44,7 +44,7 @@ export class FileDestination implements Destination {
         appendFile: (path: string, data: string) => Promise<void>;
         rename: (oldPath: string, newPath: string) => Promise<void>;
         stat: (path: string) => Promise<{ size: number }>;
-        mkdir: (path: string, options: { recursive: boolean }) => Promise<void>;
+        mkdir: (path: string, options: { recursive: true }) => Promise<string | undefined>;
         readdir: (path: string) => Promise<string[]>;
         unlink: (path: string) => Promise<void>;
     } | null = null;
@@ -75,18 +75,19 @@ export class FileDestination implements Destination {
                 const fs = await import('fs/promises');
                 const path = await import('path');
 
-                this.fs = {
+                const fsOps = {
                     appendFile: fs.appendFile,
                     rename: fs.rename,
                     stat: fs.stat,
-                    mkdir: fs.mkdir,
+                    mkdir: (p: string, opts: { recursive: true }) => fs.mkdir(p, opts),
                     readdir: fs.readdir,
                     unlink: fs.unlink,
                 };
+                this.fs = fsOps;
 
                 // Ensure directory exists
                 const dir = path.dirname(this.config.path);
-                await this.fs.mkdir(dir, { recursive: true });
+                await fsOps.mkdir(dir, { recursive: true });
             } catch {
                 console.warn('[Statly Logger] File destination not available (not Node.js)');
                 this.config.enabled = false;

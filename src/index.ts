@@ -299,3 +299,50 @@ export {
     captureNextJsError,
 } from './integrations/nextjs';
 export { statlyFastifyPlugin, statlyPlugin, createRequestCapture } from './integrations/fastify';
+
+// Logger
+export {
+    Logger,
+    Scrubber,
+    ConsoleDestination,
+    ObserveDestination,
+    FileDestination,
+    AIFeatures,
+    getDefaultLogger,
+    setDefaultLogger,
+    LOG_LEVELS,
+    DEFAULT_LEVELS,
+    EXTENDED_LEVELS,
+    SENSITIVE_KEYS,
+    SCRUB_PATTERNS,
+    REDACTED,
+    isSensitiveKey,
+    formatPretty,
+    formatJson,
+    formatJsonPretty,
+    getConsoleMethod,
+    // Convenience functions
+    trace as logTrace,
+    debug as logDebug,
+    info as logInfo,
+    warn as logWarn,
+    error as logError,
+    fatal as logFatal,
+    audit as logAudit,
+} from './logger';
+
+export type {
+    LogLevel,
+    LogEntry,
+    LoggerConfig,
+    Destination,
+    ConsoleDestinationConfig,
+    FileDestinationConfig,
+    FileRotationConfig,
+    ObserveDestinationConfig,
+    ScrubbingConfig,
+    ScrubPattern,
+    ErrorExplanation,
+    FixSuggestion,
+    LevelSet,
+} from './logger';
