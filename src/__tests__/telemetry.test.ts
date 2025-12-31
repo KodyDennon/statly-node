@@ -23,7 +23,7 @@ describe('Telemetry', () => {
         expect(result).toBe(42);
         expect(sendSpy).toHaveBeenCalled();
         
-        const event = sendSpy.mock.calls[0][0];
+        const event = sendSpy.mock.calls[0][0] as any;
         expect(event.level).toBe('span');
         expect(event.span.name).toBe('test-span');
         expect(event.span.tags.foo).toBe('bar');
@@ -45,7 +45,7 @@ describe('Telemetry', () => {
         }
 
         expect(sendSpy).toHaveBeenCalled();
-        const event = sendSpy.mock.calls[0][0];
+        const event = sendSpy.mock.calls[0][0] as any;
         expect(event.span.status).toBe(SpanStatus.ERROR);
         expect(event.span.tags.error).toBe('true');
     });

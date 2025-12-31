@@ -43,7 +43,7 @@ export class ConsoleIntegration {
 
         for (const level of this.levels) {
             if (this.originalMethods[level]) {
-                (console as Record<string, unknown>)[level] = this.originalMethods[level];
+                (console as any)[level] = this.originalMethods[level];
                 delete this.originalMethods[level];
             }
         }
@@ -60,7 +60,7 @@ export class ConsoleIntegration {
         this.originalMethods[level] = originalMethod;
 
         const self = this;
-        (console as Record<string, unknown>)[level] = function (...args: unknown[]) {
+        (console as any)[level] = function (...args: unknown[]) {
             // Create breadcrumb
             if (self.callback) {
                 self.callback({
