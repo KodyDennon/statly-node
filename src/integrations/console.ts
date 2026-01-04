@@ -59,14 +59,13 @@ export class ConsoleIntegration {
 
         this.originalMethods[level] = originalMethod;
 
-        const self = this;
-        (console as any)[level] = function (...args: unknown[]) {
+        (console as any)[level] = (...args: unknown[]) => {
             // Create breadcrumb
-            if (self.callback) {
-                self.callback({
+            if (this.callback) {
+                this.callback({
                     category: 'console',
-                    message: self.formatArgs(args),
-                    level: self.mapLevel(level),
+                    message: this.formatArgs(args),
+                    level: this.mapLevel(level),
                     data: args.length > 1 ? { arguments: args } : undefined,
                 });
             }

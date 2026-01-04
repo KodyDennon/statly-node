@@ -42,7 +42,7 @@ export const SENSITIVE_KEYS = new Set([
 // Pattern definitions with regex and description
 export const SCRUB_PATTERNS: Record<ScrubPattern, { regex: RegExp; description: string }> = {
     apiKey: {
-        regex: /(?:api[_-]?key|apikey)\s*[=:]\s*["']?([a-zA-Z0-9_\-]{20,})["']?/gi,
+        regex: /(?:api[_-]?key|apikey)\s*[=:]\s*["']?([a-zA-Z0-9_-]{20,})["']?/gi,
         description: 'API keys in various formats',
     },
     password: {
@@ -50,7 +50,7 @@ export const SCRUB_PATTERNS: Record<ScrubPattern, { regex: RegExp; description: 
         description: 'Passwords and secrets',
     },
     token: {
-        regex: /(?:bearer\s+|token\s*[=:]\s*["']?)([a-zA-Z0-9_\-\.]{20,})["']?/gi,
+        regex: /(?:bearer\s+|token\s*[=:]\s*["']?)([a-zA-Z0-9._-]{20,})["']?/gi,
         description: 'Bearer tokens and auth tokens',
     },
     creditCard: {
