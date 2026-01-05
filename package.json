@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "@statly/observe",
+  "name": "@dd/observe",
   "version": "1.2.0",
   "description": "JavaScript SDK for Statly Observe - Error tracking and monitoring",
   "main": "dist/index.js",
